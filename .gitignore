@@ -1,0 +1,14 @@
+# .NET
+**/bin/
+**/obj/
+**/.vs/
+*.user
+src/BarberShop.API/appsettings.Development.json
+
+# Next.js
+barber-web/.next/
+barber-web/node_modules/
+barber-web/.env.local
+z
+# Geral
+.DS_Store
