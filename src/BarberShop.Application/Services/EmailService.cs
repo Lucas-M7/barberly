@@ -1,16 +1,20 @@
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using MimeKit;
 
 namespace BarberShop.Application.Services;
 
-public class EmailService(IConfiguration config, HttpClient httpClient)
+public class EmailService(IConfiguration config, ILogger<EmailService> logger)
 {
-    private readonly string _apiKey = config["Email:ResendApiKey"]!;
-    private readonly string _fromName = config["Email:FromName"]!;
-    private readonly string _fromAddress = config["Email:FromAddress"]!;
-    private readonly string _frontendUrl = config["App:FrontendUrl"]!;
+    private readonly string _host = config["Email:Host"] ?? "smtp.gmail.com";
+    private readonly int _port = int.Parse(config["Email:Port"] ?? "587");
+    private readonly string _username = config["Email:Username"] ?? string.Empty;
+    private readonly string _password = config["Email:Password"] ?? string.Empty;
+    private readonly string _fromName = config["Email:FromName"] ?? "Noblecut";
+    private readonly string _fromAddress = config["Email:FromAddress"] ?? string.Empty;
+    private readonly string _frontendUrl = config["App:FrontendUrl"] ?? "http://localhost:3000";
 
     public async Task SendEmailConfirmationAsync(string toEmail, string toName, string token)
     {
@@ -30,10 +34,13 @@ public class EmailService(IConfiguration config, HttpClient httpClient)
                 <p style="color:#a1a1aa;font-size:12px;">
                     Este link expira em 24 horas.
                 </p>
+                <p style="color:#a1a1aa;font-size:12px;">
+                    Ou copie: {link}
+                </p>
             </div>
             """;
 
-        await SendAsync(toEmail, toName, "Confirme seu e-mail — Barberly", body);
+        await SendAsync(toEmail, toName, "Confirme seu e-mail — Noblecut", body);
     }
 
     public async Task SendPasswordResetAsync(string toEmail, string toName, string token)
@@ -57,31 +64,37 @@ public class EmailService(IConfiguration config, HttpClient httpClient)
             </div>
             """;
 
-        await SendAsync(toEmail, toName, "Redefinição de senha — Barberly", body);
+        await SendAsync(toEmail, toName, "Redefinição de senha — Noblecut", body);
     }
 
     private async Task SendAsync(string toEmail, string toName, string subject, string htmlBody)
     {
-        var payload = new
+        if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_password))
         {
-            from = $"{_fromName} <{_fromAddress}>",
-            to = new[] { toEmail },
-            subject,
-            html = htmlBody
-        };
+            logger.LogWarning("Credenciais de email não configuradas. Email para {Email} não enviado.", toEmail);
+            throw new InvalidOperationException("Serviço de email não configurado.");
+        }
 
-        var json = JsonSerializer.Serialize(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", _apiKey);
-
-        var response = await httpClient.PostAsync("https://api.resend.com/emails", content);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            var error = await response.Content.ReadAsStringAsync();
-            throw new InvalidOperationException($"Falha ao enviar email: {error}");
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_fromName, _fromAddress));
+            message.To.Add(new MailboxAddress(toName, toEmail));
+            message.Subject = subject;
+            message.Body = new TextPart("html") { Text = htmlBody };
+
+            using var client = new SmtpClient();
+            await client.ConnectAsync(_host, _port, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(_username, _password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+
+            logger.LogInformation("Email enviado com sucesso para {Email}", toEmail);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Falha ao enviar email para {Email}: {Error}", toEmail, ex.Message);
+            throw new InvalidOperationException($"Falha ao enviar email: {ex.Message}");
         }
     }
-}
+}   

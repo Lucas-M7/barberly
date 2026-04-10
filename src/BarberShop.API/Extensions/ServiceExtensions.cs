@@ -16,7 +16,7 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddHttpClient<EmailService>();
+        services.AddScoped<EmailService>();
         services.AddScoped<AuthService>();
         services.AddScoped<ProfileService>();
         services.AddScoped<ServiceService>();

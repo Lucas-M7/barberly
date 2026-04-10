@@ -40,7 +40,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900">✂️ Barberly</h1>
+          <h1 className="text-3xl font-bold text-zinc-900">✂️ Noblecut</h1>
           <p className="text-zinc-500 mt-2">Crie sua conta</p>
         </div>
 

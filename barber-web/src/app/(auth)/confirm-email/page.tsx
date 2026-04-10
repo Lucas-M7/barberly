@@ -77,7 +77,7 @@ export default function ConfirmEmailPage() {
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">✂️ BarberShop</h1>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">✂️ Noblecut</h1>
         </div>
         {/* Suspense é obrigatório quando useSearchParams é usado em páginas estáticas */}
         <Suspense fallback={
