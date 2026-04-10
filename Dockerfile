@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY BarberShop.sln .
+COPY BarberShop.slnx .
 COPY src/BarberShop.API/BarberShop.API.csproj src/BarberShop.API/
 COPY src/BarberShop.Application/BarberShop.Application.csproj src/BarberShop.Application/
 COPY src/BarberShop.Domain/BarberShop.Domain.csproj src/BarberShop.Domain/
