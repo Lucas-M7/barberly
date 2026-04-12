@@ -72,14 +72,14 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <p className="text-center text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+          {/* <p className="text-center text-sm text-zinc-500 dark:text-zinc-400 mt-2">
             <Link
               href="/forgot-password"
               className="text-zinc-900 dark:text-zinc-100 hover:underline"
             >
               Esqueci minha senha
             </Link>
-          </p>
+          </p> */}
         </Card>
       </div>
     </div>

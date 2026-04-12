@@ -27,22 +27,22 @@ public class AuthService(AppDbContext db, IConfiguration config, EmailService em
             Name = request.Name.Trim(),
             Email = request.Email.ToLower().Trim(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            IsEmailConfirmed = false
+            IsEmailConfirmed = true
         };
 
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
         // Tenta enviar o email mas não bloqueia o cadastro se falhar
-        try
-        {
-            var token = await CreateEmailTokenAsync(user.Id, EmailTokenType.EmailConfirmation, hours: 24);
-            await emailService.SendEmailConfirmationAsync(user.Email, user.Name, token);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning("Falha ao enviar email de confirmação para {Email}: {Error}", user.Email, ex.Message);
-        }
+        // try
+        // {
+        //     var token = await CreateEmailTokenAsync(user.Id, EmailTokenType.EmailConfirmation, hours: 24);
+        //     await emailService.SendEmailConfirmationAsync(user.Email, user.Name, token);
+        // }
+        // catch (Exception ex)
+        // {
+        //     logger.LogWarning("Falha ao enviar email de confirmação para {Email}: {Error}", user.Email, ex.Message);
+        // }
 
         return new AuthResponse
         {

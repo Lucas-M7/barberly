@@ -19,12 +19,9 @@ export default function DashboardPage() {
     setLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
-      const [prof, me] = await Promise.all([
-        api.get<Profile>("/api/profile").catch(() => null),
-        api.get<{ isEmailConfirmed: boolean }>("/api/auth/me"),
-      ]);
+      const prof = await api.get<Profile>("/api/profile").catch(() => null);
       setProfile(prof);
-      setIsEmailConfirmed(me.isEmailConfirmed);
+
       if (prof) {
         const appts = await api.get<Appointment[]>(
           `/api/appointments?date=${today}`,
@@ -87,7 +84,7 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {!isEmailConfirmed && (
+      {/* {!isEmailConfirmed && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 dark:bg-blue-950 dark:border-blue-700 dark:text-blue-300 flex items-start justify-between gap-4">
           <p>📧 Confirme seu e-mail para garantir o acesso à sua conta.</p>
           <button
@@ -97,7 +94,7 @@ export default function DashboardPage() {
             Reenviar
           </button>
         </div>
-      )}
+      )} */}
 
       {!profile && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 dark:bg-amber-950 dark:border-amber-700 dark:text-amber-300">
